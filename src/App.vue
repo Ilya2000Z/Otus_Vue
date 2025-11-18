@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import ListComponent from "./components/listComponent.vue";
+  import ListProduct from "./components/ListProduct.vue";
 </script>
 
 <template>
@@ -11,7 +11,8 @@
       <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
     </a>
   </div>
-  <ListComponent/>
+  <ListProduct/>
+<!--  <ListComponent/>-->
 <!--  <HelloWorld msg="Vite + Vue" />-->
 </template>
 
