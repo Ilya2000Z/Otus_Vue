@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { productService } from '../services/api'
+import { useCart } from '../composables/useCart'
 import type { Product, SearchFilters } from '../types'
 
 const props = defineProps<{
   filters: SearchFilters
 }>()
+
+const router = useRouter()
+const { addToCart } = useCart()
 
 const products = ref<Product[]>([])
 const loading = ref(false)
@@ -43,6 +48,15 @@ const loadProducts = async () => {
   }
 }
 
+const handleAddToCart = (product: Product, event: Event) => {
+  event.stopPropagation()
+  addToCart(product)
+}
+
+const goToProduct = (productId: number) => {
+  router.push(`/product/${productId}`)
+}
+
 onMounted(() => {
   loadProducts()
 })
@@ -56,7 +70,12 @@ onMounted(() => {
       Товары не найдены
     </div>
     <div v-else class="products-grid">
-      <div v-for="product in filteredProducts" :key="product.id" class="product-card">
+      <div
+        v-for="product in filteredProducts"
+        :key="product.id"
+        class="product-card"
+        @click="goToProduct(product.id)"
+      >
         <img :src="product.image" :alt="product.title" class="product-image" />
         <div class="product-info">
           <h3 class="product-title">{{ product.title }}</h3>
@@ -68,6 +87,12 @@ onMounted(() => {
               ⭐ {{ product.rating.rate }} ({{ product.rating.count }})
             </div>
           </div>
+          <button
+            class="add-to-cart-btn"
+            @click="handleAddToCart(product, $event)"
+          >
+            Добавить в корзину
+          </button>
         </div>
       </div>
     </div>
@@ -108,6 +133,7 @@ onMounted(() => {
   transition: transform 0.3s, box-shadow 0.3s;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 }
 
 .product-card:hover {
@@ -175,6 +201,28 @@ onMounted(() => {
 .product-rating {
   font-size: 0.9rem;
   color: #666;
+}
+
+.add-to-cart-btn {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.add-to-cart-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.add-to-cart-btn:active {
+  transform: translateY(0);
 }
 </style>
 

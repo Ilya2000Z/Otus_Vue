@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+import NavigationMenu from './components/NavigationMenu.vue'
 </script>
 
 <template>
-  <RouterView />
+  <div class="app">
+    <NavigationMenu />
+    <RouterView />
+  </div>
 </template>
 
 <style>

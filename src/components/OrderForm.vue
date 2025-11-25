@@ -4,9 +4,15 @@ import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 import { useRouter } from 'vue-router'
 import { orderService } from '../services/api'
+import { useCart } from '../composables/useCart'
 import type { OrderFormData } from '../types'
 
+const props = defineProps<{
+  hideBackButton?: boolean
+}>()
+
 const router = useRouter()
+const { clearCart } = useCart()
 const showNotification = ref(false)
 
 const schema = yup.object({
@@ -111,6 +117,7 @@ const handleCardCvvInput = (event: Event) => {
 const onSubmit = handleSubmit(async (values) => {
   try {
     await orderService.submitOrder(values)
+    clearCart()
     showNotification.value = true
     setTimeout(() => {
       router.push('/')
@@ -134,7 +141,7 @@ const countries = [
 
 <template>
   <div class="order-form-container">
-    <div class="back-button">
+    <div v-if="!hideBackButton" class="back-button">
       <button type="button" class="back-btn" @click="router.push('/')">
         ← Назад к товарам
       </button>
@@ -346,6 +353,12 @@ const countries = [
   min-height: 100vh;
   background: #f5f5f5;
   padding-bottom: 2rem;
+}
+
+.order-form-container:has(.order-form-wrapper) {
+  min-height: auto;
+  background: transparent;
+  padding-bottom: 0;
 }
 
 .back-button {
