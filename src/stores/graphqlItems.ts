@@ -1,5 +1,13 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, type Ref } from 'vue'
+import type {
+  GraphQLItem,
+  ItemsQueryData,
+  ItemAddedSubscriptionResult,
+  ItemStatusChangedSubscriptionResult,
+  SubscriptionObserver,
+  Unsubscribe,
+} from '../types/graphql'
 import { apolloClient } from '../graphql/client'
 import {
   ITEMS_QUERY,
@@ -8,26 +16,22 @@ import {
   ITEM_STATUS_CHANGED_SUBSCRIPTION,
 } from '../graphql/operations'
 
-export interface GraphQLItem {
-  id: string
-  title: string
-  status: string
-}
+export type { GraphQLItem }
 
 export const useGraphQLItemsStore = defineStore('graphqlItems', () => {
-  const items = ref<GraphQLItem[]>([])
-  const loading = ref(false)
-  const error = ref<string | null>(null)
+  const items: Ref<GraphQLItem[]> = ref<GraphQLItem[]>([])
+  const loading: Ref<boolean> = ref(false)
+  const error: Ref<string | null> = ref<string | null>(null)
 
-  async function fetchItems() {
+  async function fetchItems(): Promise<void> {
     loading.value = true
     error.value = null
     try {
-      const result = await apolloClient.query<{ items: GraphQLItem[] }>({
+      const result = await apolloClient.query<ItemsQueryData>({
         query: ITEMS_QUERY,
       })
       items.value = result.data?.items ?? []
-    } catch (e) {
+    } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Ошибка загрузки'
       items.value = []
     } finally {
@@ -35,7 +39,7 @@ export const useGraphQLItemsStore = defineStore('graphqlItems', () => {
     }
   }
 
-  async function addItem(title: string, status?: string) {
+  async function addItem(title: string, status?: string): Promise<void> {
     error.value = null
     try {
       await apolloClient.mutate({
@@ -43,12 +47,12 @@ export const useGraphQLItemsStore = defineStore('graphqlItems', () => {
         variables: { title, status },
       })
       await fetchItems()
-    } catch (e) {
+    } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Ошибка добавления'
     }
   }
 
-  function updateItem(updated: GraphQLItem) {
+  function updateItem(updated: GraphQLItem): void {
     const idx = items.value.findIndex((i) => i.id === updated.id)
     if (idx >= 0) {
       items.value = [
@@ -61,24 +65,29 @@ export const useGraphQLItemsStore = defineStore('graphqlItems', () => {
     }
   }
 
-  function subscribeToUpdates() {
-    const addedObs = apolloClient.subscribe<{ itemAdded: GraphQLItem }>({
+  function subscribeToUpdates(): Unsubscribe {
+    const addedObs = apolloClient.subscribe<ItemAddedSubscriptionResult['data']>({
       query: ITEM_ADDED_SUBSCRIPTION,
     })
-    type Sub = { subscribe: (next: (r: { data?: { itemAdded: GraphQLItem } }) => void) => { unsubscribe: () => void } }
-    const addedSub = (addedObs as unknown as Sub).subscribe((result) => {
+    const addedSub = (
+      addedObs as unknown as SubscriptionObserver<ItemAddedSubscriptionResult>
+    ).subscribe((result: ItemAddedSubscriptionResult) => {
       if (result.data?.itemAdded) updateItem(result.data.itemAdded)
     })
 
-    const statusObs = apolloClient.subscribe<{ itemStatusChanged: GraphQLItem }>({
+    const statusObs = apolloClient.subscribe<
+      ItemStatusChangedSubscriptionResult['data']
+    >({
       query: ITEM_STATUS_CHANGED_SUBSCRIPTION,
     })
-    type SubStatus = { subscribe: (next: (r: { data?: { itemStatusChanged: GraphQLItem } }) => void) => { unsubscribe: () => void } }
-    const statusSub = (statusObs as unknown as SubStatus).subscribe((result) => {
-      if (result.data?.itemStatusChanged) updateItem(result.data.itemStatusChanged)
+    const statusSub = (
+      statusObs as unknown as SubscriptionObserver<ItemStatusChangedSubscriptionResult>
+    ).subscribe((result: ItemStatusChangedSubscriptionResult) => {
+      if (result.data?.itemStatusChanged)
+        updateItem(result.data.itemStatusChanged)
     })
 
-    return () => {
+    return (): void => {
       addedSub.unsubscribe()
       statusSub.unsubscribe()
     }

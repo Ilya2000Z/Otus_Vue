@@ -1,4 +1,10 @@
 import { gql } from '@apollo/client/core'
+import type {
+  ItemsQueryData,
+  AddItemMutationVariables,
+  ItemAddedSubscriptionData,
+  ItemStatusChangedSubscriptionData,
+} from '../types/graphql'
 
 export const ITEMS_QUERY = gql`
   query Items {
@@ -39,3 +45,6 @@ export const ITEM_STATUS_CHANGED_SUBSCRIPTION = gql`
     }
   }
 `
+
+export type { ItemsQueryData, AddItemMutationVariables }
+export type { ItemAddedSubscriptionData, ItemStatusChangedSubscriptionData }
