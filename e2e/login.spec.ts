@@ -1,0 +1,47 @@
+import { test, expect } from '@playwright/test'
+
+test.describe('Логин', () => {
+  test('форма логина отображает поля и валидирует их', async ({ page }) => {
+    await page.goto('/login')
+    await expect(page.getByRole('heading', { name: /вход в систему/i })).toBeVisible()
+    await expect(page.locator('input#username')).toBeVisible()
+    await expect(page.locator('input#password')).toBeVisible()
+    await page.getByRole('button', { name: /войти/i }).click()
+    await expect(page.locator('.error-message').first()).toBeVisible()
+  })
+
+  test('успешный логин сохраняет данные в localStorage и перенаправляет', async ({ page }) => {
+    await page.goto('/login')
+    await page.locator('input#username').fill('user')
+    await page.locator('input#password').fill('password')
+    await page.locator('input#name').fill('Иван Иванов')
+    await page.locator('input#email').fill('ivan@test.ru')
+    await page.locator('input#country').fill('Россия')
+    await page.locator('input#city').fill('Москва')
+    await page.locator('input#street').fill('Ленина')
+    await page.locator('input#house').fill('1')
+    await page.getByRole('button', { name: /войти/i }).click()
+    await expect(page).toHaveURL(/\//)
+    const customer = await page.evaluate(() => localStorage.getItem('customer'))
+    expect(customer).toBeTruthy()
+    const data = JSON.parse(customer!)
+    expect(data.name).toBe('Иван Иванов')
+    expect(data.email).toBe('ivan@test.ru')
+  })
+
+  test('после логина в навигации видны данные покупателя и кнопка Выйти', async ({ page }) => {
+    await page.goto('/login')
+    await page.locator('input#username').fill('user')
+    await page.locator('input#password').fill('pass')
+    await page.locator('input#name').fill('Тест Тестович')
+    await page.locator('input#email').fill('test@test.ru')
+    await page.locator('input#country').fill('РФ')
+    await page.locator('input#city').fill('Москва')
+    await page.locator('input#street').fill('Улица')
+    await page.locator('input#house').fill('1')
+    await page.getByRole('button', { name: /войти/i }).click()
+    await page.waitForURL(/\//)
+    await expect(page.getByText('Тест Тестович')).toBeVisible()
+    await expect(page.getByRole('button', { name: /выйти/i })).toBeVisible()
+  })
+})
