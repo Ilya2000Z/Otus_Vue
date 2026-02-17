@@ -40,3 +40,16 @@ export interface SearchFilters {
   maxPrice: number | null
 }
 
+export interface CustomerAddress {
+  country: string
+  city: string
+  street: string
+  house: string
+}
+
+export interface Customer {
+  name: string
+  email: string
+  address: CustomerAddress
+}
+

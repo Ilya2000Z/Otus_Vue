@@ -1,28 +1,13 @@
-import { ref, computed } from 'vue'
-
-const isAuthenticated = ref(false)
-
-// Проверка авторизации при загрузке
-if (typeof window !== 'undefined') {
-  const authStatus = localStorage.getItem('isAuthenticated')
-  isAuthenticated.value = authStatus === 'true'
-}
+import { storeToRefs } from 'pinia'
+import { useCustomerStore } from '../stores/customer'
 
 export const useAuth = () => {
-  const login = () => {
-    isAuthenticated.value = true
-    localStorage.setItem('isAuthenticated', 'true')
-  }
-
-  const logout = () => {
-    isAuthenticated.value = false
-    localStorage.removeItem('isAuthenticated')
-  }
-
+  const store = useCustomerStore()
+  const { customer, isAuthenticated } = storeToRefs(store)
   return {
-    isAuthenticated: computed(() => isAuthenticated.value),
-    login,
-    logout,
+    customer,
+    isAuthenticated,
+    login: store.login,
+    logout: store.logout,
   }
 }
-

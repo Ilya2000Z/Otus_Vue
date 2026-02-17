@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { productService } from '../services/api'
-import { useCart } from '../composables/useCart'
+import { storeToRefs } from 'pinia'
+import { useCatalogStore } from '../stores/catalog'
+import { useCartStore } from '../stores/cart'
 import type { Product, SearchFilters } from '../types'
 
 const props = defineProps<{
@@ -10,11 +11,9 @@ const props = defineProps<{
 }>()
 
 const router = useRouter()
-const { addToCart } = useCart()
-
-const products = ref<Product[]>([])
-const loading = ref(false)
-const error = ref<string | null>(null)
+const catalogStore = useCatalogStore()
+const cartStore = useCartStore()
+const { products, loading, error } = storeToRefs(catalogStore)
 
 const filteredProducts = computed(() => {
   let result = products.value
@@ -35,22 +34,9 @@ const filteredProducts = computed(() => {
   return result
 })
 
-const loadProducts = async () => {
-  loading.value = true
-  error.value = null
-  try {
-    products.value = await productService.getAllProducts()
-  } catch (err) {
-    error.value = 'Ошибка загрузки товаров'
-    console.error(err)
-  } finally {
-    loading.value = false
-  }
-}
-
 const handleAddToCart = (product: Product, event: Event) => {
   event.stopPropagation()
-  addToCart(product)
+  cartStore.add(product)
 }
 
 const goToProduct = (productId: number) => {
@@ -58,7 +44,9 @@ const goToProduct = (productId: number) => {
 }
 
 onMounted(() => {
-  loadProducts()
+  if (products.value.length === 0) {
+    catalogStore.fetchProducts()
+  }
 })
 </script>
 
