@@ -1,25 +1,26 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGraphQLItemsStore } from '../stores/graphqlItems'
+import type { Unsubscribe } from '../types/graphql'
 
 const store = useGraphQLItemsStore()
 const { items, loading, error } = storeToRefs(store)
 
-const newTitle = ref('')
-let unsubscribe: (() => void) | null = null
+const newTitle: Ref<string> = ref<string>('')
+let unsubscribe: Unsubscribe | null = null
 
-onMounted(async () => {
+onMounted(async (): Promise<void> => {
   await store.fetchItems()
   unsubscribe = store.subscribeToUpdates()
 })
 
-onUnmounted(() => {
+onUnmounted((): void => {
   unsubscribe?.()
 })
 
-async function handleAdd() {
-  const title = newTitle.value.trim()
+async function handleAdd(): Promise<void> {
+  const title: string = newTitle.value.trim()
   if (!title) return
   await store.addItem(title)
   newTitle.value = ''

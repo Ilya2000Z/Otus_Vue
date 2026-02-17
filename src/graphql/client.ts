@@ -9,14 +9,15 @@ import { getMainDefinition } from '@apollo/client/utilities'
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { createClient } from 'graphql-ws'
 
-const httpLink = new HttpLink({
-  uri: import.meta.env.VITE_GRAPHQL_HTTP ?? 'http://localhost:4000/graphql',
-})
+const graphqlHttpUri: string =
+  import.meta.env.VITE_GRAPHQL_HTTP ?? 'http://localhost:4000/graphql'
+const graphqlWsUri: string =
+  import.meta.env.VITE_GRAPHQL_WS ?? 'ws://localhost:4000/graphql'
+
+const httpLink = new HttpLink({ uri: graphqlHttpUri })
 
 const wsLink = new GraphQLWsLink(
-  createClient({
-    url: import.meta.env.VITE_GRAPHQL_WS ?? 'ws://localhost:4000/graphql',
-  })
+  createClient({ url: graphqlWsUri })
 )
 
 const link = split(
