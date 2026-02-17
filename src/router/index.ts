@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useCustomerStore } from '../stores/customer'
 import Home from '../views/Home.vue'
 import Cart from '../views/Cart.vue'
 import ProductDetail from '../views/ProductDetail.vue'
@@ -44,11 +45,9 @@ const router = createRouter({
   ],
 })
 
-// Navigation guard для защиты страниц, требующих авторизации
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'
-
-  if (to.meta.requiresAuth && !isAuthenticated) {
+router.beforeEach((to, _from, next) => {
+  const customerStore = useCustomerStore()
+  if (to.meta.requiresAuth && !customerStore.isAuthenticated) {
     next({ name: 'Login', query: { redirect: to.fullPath } })
   } else {
     next()

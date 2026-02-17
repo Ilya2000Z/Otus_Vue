@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useCart } from '../composables/useCart'
 import { useAuth } from '../composables/useAuth'
@@ -7,16 +6,14 @@ import { useAuth } from '../composables/useAuth'
 const router = useRouter()
 const route = useRoute()
 const { totalItems } = useCart()
-const { isAuthenticated, logout } = useAuth()
+const { customer, isAuthenticated, logout } = useAuth()
 
 const handleLogout = () => {
   logout()
   router.push('/')
 }
 
-const isActive = (path: string) => {
-  return route.path === path
-}
+const isActive = (path: string) => route.path === path
 </script>
 
 <template>
@@ -25,7 +22,7 @@ const isActive = (path: string) => {
       <div class="nav-brand" @click="router.push('/')">
         🛍️ Интернет-магазин
       </div>
-      
+
       <div class="nav-links">
         <router-link to="/" class="nav-link" :class="{ active: isActive('/') }">
           Главная
@@ -42,21 +39,30 @@ const isActive = (path: string) => {
         >
           Добавить товар
         </router-link>
+        <template v-if="isAuthenticated && customer">
+          <div class="nav-user">
+            <span class="nav-user-name">{{ customer.name }}</span>
+            <span class="nav-user-email">{{ customer.email }}</span>
+            <span class="nav-user-address">
+              {{ customer.address.city }}, {{ customer.address.street }}, {{ customer.address.house }}
+            </span>
+          </div>
+          <button
+            type="button"
+            class="nav-link logout-btn"
+            @click="handleLogout"
+          >
+            Выйти
+          </button>
+        </template>
         <router-link
-          v-if="!isAuthenticated"
+          v-else
           to="/login"
           class="nav-link"
           :class="{ active: isActive('/login') }"
         >
           Войти
         </router-link>
-        <button
-          v-if="isAuthenticated"
-          class="nav-link logout-btn"
-          @click="handleLogout"
-        >
-          Выйти
-        </button>
       </div>
     </div>
   </nav>
@@ -134,6 +140,31 @@ const isActive = (path: string) => {
   font-weight: 700;
 }
 
+.nav-user {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+  color: #666;
+  max-width: 200px;
+}
+
+.nav-user-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.nav-user-email {
+  color: #667eea;
+}
+
+.nav-user-address {
+  font-size: 0.8rem;
+  color: #999;
+}
+
 .logout-btn {
   background: none;
   border: none;
@@ -154,4 +185,5 @@ const isActive = (path: string) => {
   }
 }
 </style>
+
 

@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
-import { useAuth } from '../composables/useAuth'
+import { useCustomerStore } from '../stores/customer'
+import type { Customer } from '../types'
 
 const router = useRouter()
 const route = useRoute()
-const { login } = useAuth()
+const customerStore = useCustomerStore()
 
 const schema = yup.object({
   username: yup
@@ -18,6 +18,18 @@ const schema = yup.object({
     .string()
     .required('Пароль обязателен для заполнения')
     .min(4, 'Пароль должен содержать минимум 4 символа'),
+  name: yup
+    .string()
+    .required('Имя обязательно для заполнения')
+    .min(2, 'Минимум 2 символа'),
+  email: yup
+    .string()
+    .required('Email обязателен для заполнения')
+    .email('Введите корректный email'),
+  country: yup.string().required('Страна обязательна'),
+  city: yup.string().required('Город обязателен'),
+  street: yup.string().required('Улица обязательна'),
+  house: yup.string().required('Дом обязателен'),
 })
 
 const { defineField, handleSubmit, errors } = useForm({
@@ -26,11 +38,27 @@ const { defineField, handleSubmit, errors } = useForm({
 
 const [username, usernameAttrs] = defineField('username')
 const [password, passwordAttrs] = defineField('password')
+const [name, nameAttrs] = defineField('name')
+const [email, emailAttrs] = defineField('email')
+const [country, countryAttrs] = defineField('country')
+const [city, cityAttrs] = defineField('city')
+const [street, streetAttrs] = defineField('street')
+const [house, houseAttrs] = defineField('house')
 
-const onSubmit = handleSubmit(() => {
-  login()
+const onSubmit = handleSubmit((values) => {
+  const customer: Customer = {
+    name: values.name,
+    email: values.email,
+    address: {
+      country: values.country,
+      city: values.city,
+      street: values.street,
+      house: values.house,
+    },
+  }
+  customerStore.login(customer)
   const redirect = route.query.redirect as string
-  router.push(redirect || '/product/new')
+  router.push(redirect || '/')
 })
 </script>
 
@@ -39,7 +67,7 @@ const onSubmit = handleSubmit(() => {
     <div class="login-container">
       <div class="login-card">
         <h1>Вход в систему</h1>
-        <p class="login-subtitle">Войдите для доступа к панели администратора</p>
+        <p class="login-subtitle">Введите данные для входа и доставки</p>
 
         <form @submit="onSubmit" class="login-form">
           <div class="form-group">
@@ -70,11 +98,93 @@ const onSubmit = handleSubmit(() => {
             <span v-if="errors.password" class="error-message">{{ errors.password }}</span>
           </div>
 
+          <div class="form-section-label">Данные покупателя</div>
+          <div class="form-group">
+            <label for="name">ФИО *</label>
+            <input
+              id="name"
+              v-model="name"
+              v-bind="nameAttrs"
+              type="text"
+              placeholder="Иванов Иван Иванович"
+              class="form-input"
+              :class="{ error: errors.name }"
+            />
+            <span v-if="errors.name" class="error-message">{{ errors.name }}</span>
+          </div>
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input
+              id="email"
+              v-model="email"
+              v-bind="emailAttrs"
+              type="email"
+              placeholder="example@mail.com"
+              class="form-input"
+              :class="{ error: errors.email }"
+            />
+            <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
+          </div>
+
+          <div class="form-section-label">Адрес</div>
+          <div class="form-group">
+            <label for="country">Страна *</label>
+            <input
+              id="country"
+              v-model="country"
+              v-bind="countryAttrs"
+              type="text"
+              placeholder="Россия"
+              class="form-input"
+              :class="{ error: errors.country }"
+            />
+            <span v-if="errors.country" class="error-message">{{ errors.country }}</span>
+          </div>
+          <div class="form-group">
+            <label for="city">Город *</label>
+            <input
+              id="city"
+              v-model="city"
+              v-bind="cityAttrs"
+              type="text"
+              placeholder="Москва"
+              class="form-input"
+              :class="{ error: errors.city }"
+            />
+            <span v-if="errors.city" class="error-message">{{ errors.city }}</span>
+          </div>
+          <div class="form-group">
+            <label for="street">Улица *</label>
+            <input
+              id="street"
+              v-model="street"
+              v-bind="streetAttrs"
+              type="text"
+              placeholder="Ленина"
+              class="form-input"
+              :class="{ error: errors.street }"
+            />
+            <span v-if="errors.street" class="error-message">{{ errors.street }}</span>
+          </div>
+          <div class="form-group">
+            <label for="house">Дом *</label>
+            <input
+              id="house"
+              v-model="house"
+              v-bind="houseAttrs"
+              type="text"
+              placeholder="10"
+              class="form-input"
+              :class="{ error: errors.house }"
+            />
+            <span v-if="errors.house" class="error-message">{{ errors.house }}</span>
+          </div>
+
           <button type="submit" class="submit-btn">Войти</button>
         </form>
 
         <div class="login-footer">
-          <button class="back-link" @click="router.push('/')">
+          <button type="button" class="back-link" @click="router.push('/')">
             ← Вернуться на главную
           </button>
         </div>
@@ -123,6 +233,13 @@ const onSubmit = handleSubmit(() => {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+.form-section-label {
+  font-weight: 600;
+  color: #667eea;
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
 }
 
 .form-group {
@@ -201,4 +318,3 @@ label {
   color: #764ba2;
 }
 </style>
-
