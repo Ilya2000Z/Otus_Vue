@@ -31,6 +31,9 @@ const isActive = (path: string) => route.path === path
           Корзина
           <span v-if="totalItems > 0" class="cart-badge">{{ totalItems }}</span>
         </router-link>
+        <router-link to="/graphql-items" class="nav-link" :class="{ active: isActive('/graphql-items') }">
+          Заказы (GraphQL)
+        </router-link>
         <router-link
           v-if="isAuthenticated"
           to="/product/new"

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useCustomerStore } from '../stores/customer'
 import Home from '../views/Home.vue'
 import Cart from '../views/Cart.vue'
+import GraphQLItems from '../views/GraphQLItems.vue'
 import ProductDetail from '../views/ProductDetail.vue'
 import Checkout from '../views/Checkout.vue'
 import Login from '../views/Login.vue'
@@ -19,6 +20,11 @@ const router = createRouter({
       path: '/cart',
       name: 'Cart',
       component: Cart,
+    },
+    {
+      path: '/graphql-items',
+      name: 'GraphQLItems',
+      component: GraphQLItems,
     },
     {
       path: '/product/:id',

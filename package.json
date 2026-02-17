@@ -12,14 +12,24 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "dev:server": "node -r ./scripts/crypto-polyfill.cjs node_modules/vite/bin/vite"
+    "dev:server": "node -r ./scripts/crypto-polyfill.cjs node_modules/vite/bin/vite",
+    "graphql:server": "node server/index.js"
   },
   "dependencies": {
+    "@apollo/client": "^4.1.4",
+    "@graphql-tools/schema": "^10.0.31",
     "axios": "^1.13.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "graphql": "^16.12.0",
+    "graphql-http": "^1.22.4",
+    "graphql-subscriptions": "^3.0.0",
+    "graphql-ws": "^5.16.2",
     "pinia": "^3.0.4",
     "vee-validate": "^4.15.1",
     "vue": "^3.5.24",
     "vue-router": "^4.6.3",
+    "ws": "^8.19.0",
     "yup": "^1.7.1"
   },
   "devDependencies": {
