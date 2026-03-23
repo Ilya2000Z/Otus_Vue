@@ -1,68 +1,32 @@
 <template>
-  <div class="page home">
-    <h1>Добро пожаловать в Nuxt Shop</h1>
-    <p class="lead">
+  <div class="page home text-center py-8">
+    <h1 class="text-h4 font-weight-bold mb-2">Добро пожаловать в Nuxt Shop</h1>
+    <p class="text-body-1 text-medium-emphasis mb-8">
       Учебный проект: Nuxt 3, SSR, GraphQL, Pinia. Каталог товаров, корзина и профиль.
     </p>
-    <div class="cards">
-      <NuxtLink to="/catalog" class="card">
-        <span class="card-title">Каталог</span>
-        <span class="card-desc">Товары через GraphQL API</span>
-      </NuxtLink>
-      <NuxtLink to="/cart" class="card">
-        <span class="card-title">Корзина</span>
-        <span class="card-desc">{{ cartStore.totalItems }} товаров</span>
-      </NuxtLink>
-      <NuxtLink to="/profile" class="card">
-        <span class="card-title">Профиль</span>
-        <span class="card-desc">Настройки и заказы</span>
-      </NuxtLink>
-    </div>
+    <v-row justify="center">
+      <v-col cols="12" sm="6" md="4">
+        <v-card :to="'/catalog'" variant="tonal" class="pa-4 text-center" hover>
+          <v-card-title class="text-h6">Каталог</v-card-title>
+          <v-card-subtitle>Товары через GraphQL API</v-card-subtitle>
+        </v-card>
+      </v-col>
+      <v-col cols="12" sm="6" md="4">
+        <v-card :to="'/cart'" variant="tonal" class="pa-4 text-center" hover>
+          <v-card-title class="text-h6">Корзина</v-card-title>
+          <v-card-subtitle>{{ cartStore.totalItems }} товаров</v-card-subtitle>
+        </v-card>
+      </v-col>
+      <v-col cols="12" sm="6" md="4">
+        <v-card :to="'/profile'" variant="tonal" class="pa-4 text-center" hover>
+          <v-card-title class="text-h6">Профиль</v-card-title>
+          <v-card-subtitle>Настройки и заказы</v-card-subtitle>
+        </v-card>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
 <script setup lang="ts">
 const cartStore = useCartStore()
 </script>
-
-<style scoped>
-.home {
-  text-align: center;
-  padding: 2rem 0;
-}
-h1 {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-.lead {
-  color: #a1a1aa;
-  margin-bottom: 2rem;
-}
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-.card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1.5rem;
-  background: #18181b;
-  border: 1px solid #27272a;
-  border-radius: 12px;
-  transition: border-color 0.2s;
-}
-.card:hover {
-  border-color: #a78bfa;
-  text-decoration: none;
-}
-.card-title {
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
-.card-desc {
-  font-size: 0.875rem;
-  color: #71717a;
-}
-</style>

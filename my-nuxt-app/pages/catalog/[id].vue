@@ -1,15 +1,31 @@
 <template>
   <div class="page product-detail">
-    <div v-if="pending" class="loading">Загрузка...</div>
-    <div v-else-if="product" class="detail">
-      <NuxtLink to="/catalog" class="back">← Каталог</NuxtLink>
-      <h1>{{ product.title }}</h1>
-      <p class="price">{{ formatPrice(product.price) }}</p>
-      <p v-if="product.description" class="description">{{ product.description }}</p>
-      <p class="category">Категория: {{ product.category }}</p>
-      <button type="button" class="btn-add" @click="addToCart">В корзину</button>
-    </div>
-    <div v-else class="error">Товар не найден</div>
+    <v-progress-linear v-if="pending" indeterminate color="primary" class="mb-4" />
+    <template v-else-if="product">
+      <v-btn :to="'/catalog'" variant="text" size="small" class="mb-4" prepend-icon="mdi-arrow-left">
+        Каталог
+      </v-btn>
+      <v-card variant="outlined" class="pa-4">
+        <v-card-title class="text-h5">{{ product.title }}</v-card-title>
+        <v-card-subtitle class="text-h6 text-primary mt-2">
+          {{ formatPrice(product.price) }}
+        </v-card-subtitle>
+        <v-card-text v-if="product.description" class="text-medium-emphasis mt-2">
+          {{ product.description }}
+        </v-card-text>
+        <v-card-text class="text-caption text-disabled">
+          Категория: {{ product.category }}
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="primary" variant="flat" @click="addToCart">
+            В корзину
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </template>
+    <v-alert v-else type="warning" variant="tonal" class="mt-4">
+      Товар не найден
+    </v-alert>
   </div>
 </template>
 
@@ -38,46 +54,3 @@ function addToCart() {
   }
 }
 </script>
-
-<style scoped>
-.product-detail {
-  max-width: 560px;
-}
-.loading, .error {
-  color: #71717a;
-}
-.back {
-  display: inline-block;
-  margin-bottom: 1rem;
-  font-size: 0.875rem;
-}
-.detail h1 {
-  margin-bottom: 0.5rem;
-}
-.price {
-  font-size: 1.5rem;
-  color: #a78bfa;
-  margin-bottom: 1rem;
-}
-.description {
-  color: #a1a1aa;
-  margin-bottom: 0.5rem;
-}
-.category {
-  font-size: 0.875rem;
-  color: #71717a;
-  margin-bottom: 1.5rem;
-}
-.btn-add {
-  padding: 0.75rem 1.5rem;
-  background: #a78bfa;
-  color: #0f0f12;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.btn-add:hover {
-  background: #c4b5fd;
-}
-</style>

@@ -1,16 +1,18 @@
 <template>
   <div class="page profile">
-    <h1>Профиль</h1>
-    <div class="card">
-      <h2>Учебный проект</h2>
-      <p>Nuxt 3 — SSR, файловый роутинг, серверные API-маршруты.</p>
-      <p>GraphQL — запросы к каталогу через <code>/api/graphql</code>.</p>
-      <p>Pinia — состояние корзины (клиент).</p>
-      <p class="stats">
-        В корзине: <strong>{{ cartStore.totalItems }}</strong> товаров
-        на <strong>{{ formatPrice(cartStore.totalPrice) }}</strong>.
-      </p>
-    </div>
+    <h1 class="text-h4 font-weight-bold mb-4">Профиль</h1>
+    <v-card variant="outlined" class="pa-4" max-width="480">
+      <v-card-title class="text-h6">Учебный проект</v-card-title>
+      <v-card-text class="text-body-2 text-medium-emphasis">
+        <p class="mb-2">Nuxt 3 — SSR, файловый роутинг, серверные API-маршруты.</p>
+        <p class="mb-2">GraphQL — запросы к каталогу через <code class="bg-grey-lighten-2 pa-1 rounded">/api/graphql</code>.</p>
+        <p class="mb-2">Pinia — состояние корзины (клиент).</p>
+        <p class="mt-4 text-high-emphasis">
+          В корзине: <strong>{{ cartStore.totalItems }}</strong> товаров
+          на <strong>{{ formatPrice(cartStore.totalPrice) }}</strong>.
+        </p>
+      </v-card-text>
+    </v-card>
   </div>
 </template>
 
@@ -21,35 +23,3 @@ function formatPrice(price: number) {
   return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 0 }).format(price)
 }
 </script>
-
-<style scoped>
-.profile h1 {
-  margin-bottom: 1rem;
-}
-.card {
-  padding: 1.5rem;
-  background: #18181b;
-  border: 1px solid #27272a;
-  border-radius: 12px;
-  max-width: 480px;
-}
-.card h2 {
-  font-size: 1.125rem;
-  margin-bottom: 0.75rem;
-}
-.card p {
-  color: #a1a1aa;
-  margin-bottom: 0.5rem;
-  font-size: 0.9375rem;
-}
-.card code {
-  background: #27272a;
-  padding: 0.15rem 0.4rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-}
-.stats {
-  margin-top: 1rem;
-  color: #e4e4e7;
-}
-</style>
